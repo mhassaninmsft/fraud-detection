@@ -1,0 +1,14 @@
+# docker-compose.yml
+version: '3'
+services:
+  database:
+    image: "postgres" # use latest official postgres version
+    ports:
+      - "5432:5432"
+    env_file:
+      - postgres.env # configure postgres
+    volumes:
+      - postgres-bank-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+volumes:
+  postgres-bank-data:
+      external: false # named volumes can be managed easier using docker-compose
