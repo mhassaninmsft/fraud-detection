@@ -1,0 +1,6 @@
+storage_account_name = " tfstate-storage-account"
+container_name = "tfstate-container"
+key = "dcod.tfstate"
+resource_group_name = "put-resource-group-here"
+subscription_id = "put-subscription-id-here"
+tenant_id =  "put-tenant-id-here"

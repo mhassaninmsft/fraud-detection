@@ -1,0 +1,37 @@
+location = "eastus"
+environment = "local-dev"
+# provide a unique value to identify your deployment.
+build_number = "build_number"
+# Provide your alias
+# apim_publisher_name = "apim publisher name"
+# Provide your email
+# apim_publisher_email = "publisher@example.io"
+# The git commit hash, this is used for tagging the deployed resource group,
+# If deploying manually, provide any value
+git_commit_hash = "commit-hash-value"
+# The branch name of the commit hash, this is used for tagging the deployed resource group
+# If deploying manually, provide any value
+git_branch_name = "branch-name"
+# Use your alias or email. Provide a meaningful description if a service principal is being used.
+maintainer = "maintainer"
+# Provide an array of string values. Common values are ["prod", "dev", "test"]
+productTypes = ["prod", "dev", "test"]
+# Provide an array of objects.
+# Each object should have a product name, subscription_required, and published value.
+products = [
+  {
+    name = "product-one"
+    is_subscription_required = true
+    is_published = false
+  },
+  {
+    name = "product-two"
+    is_subscription_required = true
+    is_published = true
+  },
+  {
+    name = "product-three"
+    is_subscription_required = false
+    is_published = false
+  }]
+
