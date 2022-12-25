@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: joshuaavalon/flyway-action@v3.0.0
         with:
-          url: ${{secrets.dsd}}
+          url: ${{secrets.DATABASE_JDBC_URL}}
       - run: |
           echo 'testing'
           ls
