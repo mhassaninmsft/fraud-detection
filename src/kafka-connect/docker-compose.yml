@@ -56,13 +56,13 @@ services:
     #   - postgres
     env_file:
       - connect2.env # configure postgres
-    command:
-      - env
-      - cp /tmp/connect.env /kafka/config/connect-distributed.properties
-      - cp /kafka/config.orig/connect-log4j.properties /kafka/config
-      - echo "hello there"
-      - /kafka/bin/connect-distributed.sh /kafka/config/connect-distributed.properties
-      - echo "done"
+    # command:
+    #   - env
+    #   - cp /tmp/connect.env /kafka/config/connect-distributed.properties
+    #   - cp /kafka/config.orig/connect-log4j.properties /kafka/config
+    #   - echo "hello there"
+    #   - /kafka/bin/connect-distributed.sh /kafka/config/connect-distributed.properties
+    #   - echo "done"
     # environment:
       # - BOOTSTRAP_SERVERS=kafka:9092
       # - GROUP_ID=1

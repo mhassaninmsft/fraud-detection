@@ -13,6 +13,8 @@ namespace CreditCardSimulator.Startup
                 var builder = new ODataConventionModelBuilder();
                 builder.EntitySet<CreditCard>("CreditCards");
                 builder.EntitySet<CreditCardTransaction>("CreditCardTransactions");
+                builder.EntitySet<PosMachine>("PosMachines");
+                builder.EntitySet<Merchant>("Merchants");
                 return builder.GetEdmModel();
             }
         }

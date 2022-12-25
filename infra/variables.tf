@@ -14,3 +14,30 @@ variable "environment" {
   default     = "local"
   description = "Description for env"
 }
+
+
+variable "pg_username" {
+  type        = string
+  default     = "citus"
+  description = "username"
+}
+
+variable "pg_password" {
+  type        = string
+  description = "passowrd for pg"
+}
+
+variable "acr_name" {
+  type        = string
+  description = "passowrd for pg"
+}
+
+variable "container_name" {
+  type        = string
+  description = "passowrd for pg"
+}
+
+variable "eh_connection_string" {
+  type        = string
+  description = "passowrd for pg"
+}

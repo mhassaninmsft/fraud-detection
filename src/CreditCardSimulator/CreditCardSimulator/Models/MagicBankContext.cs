@@ -19,6 +19,8 @@ public partial class MagicBankContext : DbContext
 
     public virtual DbSet<CreditCardTransaction> CreditCardTransactions { get; set; }
 
+    public virtual DbSet<FlywaySchemaHistory> FlywaySchemaHistories { get; set; }
+
     public virtual DbSet<Merchant> Merchants { get; set; }
 
     public virtual DbSet<PosMachine> PosMachines { get; set; }
@@ -70,6 +72,41 @@ public partial class MagicBankContext : DbContext
                 .HasForeignKey(d => d.PosMachineId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_credit_card_transactions_pos_machine");
+        });
+
+        modelBuilder.Entity<FlywaySchemaHistory>(entity =>
+        {
+            entity.HasKey(e => e.InstalledRank).HasName("flyway_schema_history_pk");
+
+            entity.ToTable("flyway_schema_history");
+
+            entity.HasIndex(e => e.Success, "flyway_schema_history_s_idx");
+
+            entity.Property(e => e.InstalledRank)
+                .ValueGeneratedNever()
+                .HasColumnName("installed_rank");
+            entity.Property(e => e.Checksum).HasColumnName("checksum");
+            entity.Property(e => e.Description)
+                .HasMaxLength(200)
+                .HasColumnName("description");
+            entity.Property(e => e.ExecutionTime).HasColumnName("execution_time");
+            entity.Property(e => e.InstalledBy)
+                .HasMaxLength(100)
+                .HasColumnName("installed_by");
+            entity.Property(e => e.InstalledOn)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("installed_on");
+            entity.Property(e => e.Script)
+                .HasMaxLength(1000)
+                .HasColumnName("script");
+            entity.Property(e => e.Success).HasColumnName("success");
+            entity.Property(e => e.Type)
+                .HasMaxLength(20)
+                .HasColumnName("type");
+            entity.Property(e => e.Version)
+                .HasMaxLength(50)
+                .HasColumnName("version");
         });
 
         modelBuilder.Entity<Merchant>(entity =>
