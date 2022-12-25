@@ -1,0 +1,30 @@
+name: Main
+on:
+   push:
+    branches:
+      - add-initial-cicd
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: db
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: joshuaavalon/flyway-action@v3.0.0
+        with:
+          url: ${{secrets.dsd}}
+      - run: |
+          echo 'testing'
+          ls
+
+        working-directory: ./src/database
