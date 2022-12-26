@@ -31,7 +31,7 @@ jobs:
           echo 'testing'
           ls
           touch flyway.conf
-          echo "flyway.url=${FLYWAY_URL}" >>flyway.conf
+          echo "flyway.url=${{secrets.DATABASE_JDBC_URL}}" >>flyway.conf
           cat flyway.conf
           wget -qO- https://download.red-gate.com/maven/release/org/flywaydb/enterprise/flyway-commandline/9.8.1/flyway-commandline-9.8.1-linux-x64.tar.gz | tar xvz
           ln -s `pwd`/flyway-9.8.1/flyway /usr/local/bin/flyway
