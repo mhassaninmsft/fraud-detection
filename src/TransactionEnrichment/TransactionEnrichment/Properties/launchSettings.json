@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "TransactionEnrichment": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7132"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 31626,
+      "useSSL": false
+    }
+  }
+}

@@ -44,7 +44,7 @@ services:
   connect:
     image: debezium/connect:latest
     volumes:
-      # - ./connect-config/java.config:/etc/crypto-policies/back-ends/java.config
+      - ./connect-config/java.config:/etc/crypto-policies/back-ends/java.config
       - .:/tmp
     ports:
       - 8083:8083

@@ -21,3 +21,11 @@ resource "azurerm_postgresql_flexible_server_configuration" "logical_wal" {
   server_id = azurerm_postgresql_flexible_server.fraud_server.id
   value     = "LOGICAL"
 }
+resource "azurerm_postgresql_flexible_server_configuration" "uuid_extension" {
+  name      = "azure.extensions"
+  server_id = azurerm_postgresql_flexible_server.fraud_server.id
+  value     = "uuid-ossp"
+}
+
+# Need to add network layer as well
+

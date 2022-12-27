@@ -28,6 +28,14 @@ resource "azurerm_container_group" "debizium" {
       port     = 5005
       protocol = "TCP"
     }
+    volume {
+      name       = "javaempty"
+      mount_path = "/etc/crypto-policies/back-ends"
+      empty_dir  = true
+      #   secret = {
+      #     "java.config" : base64encode(" ")
+      #   }
+    }
     environment_variables = {
       "env"             = "test"
       BOOTSTRAP_SERVERS = "hassmk1eastusehns.servicebus.windows.net:9093" # e.g. namespace.servicebus.windows.net:9093
@@ -53,15 +61,17 @@ resource "azurerm_container_group" "debizium" {
       INTERNAL_VALUE_CONVERTER_SCHEMAS_ENABLE = false
 
       # required EH Kafka security settings
-      SECURITY_PROTOCOL          = "SASL_SSL"
-      SASL_MECHANISM             = "PLAIN"
-      SASL_JAAS_CONFIG           = var.eh_connection_string
-      PRODUCER_SECURITY_PROTOCOL = "SASL_SSL"
-      PRODUCER_SASL_MECHANISM    = "PLAIN"
-      PRODUCER_SASL_JAAS_CONFIG  = var.eh_connection_string
-      CONSUMER_SECURITY_PROTOCOL = "SASL_SSL"
-      CONSUMER_SASL_MECHANISM    = "PLAIN"
-      CONSUMER_SASL_JAAS_CONFIG  = var.eh_connection_string
+      CONNECT_SECURITY_PROTOCOL = "SASL_SSL"
+      CONNECT_SASL_MECHANISM    = "PLAIN"
+      CONNECT_SASL_JAAS_CONFIG  = var.eh_connection_string
+
+      CONNECT_PRODUCER_SECURITY_PROTOCOL = "SASL_SSL"
+      CONNECT_PRODUCER_SASL_MECHANISM    = "PLAIN"
+      CONNECT_PRODUCER_SASL_JAAS_CONFIG  = var.eh_connection_string
+
+      CONNECT_CONSUMER_SECURITY_PROTOCOL = "SASL_SSL"
+      CONNECT_CONSUMER_SASL_MECHANISM    = "PLAIN"
+      CONNECT_CONSUMER_SASL_JAAS_CONFIG  = var.eh_connection_string
       # PLUGIN_PATH=/kafka/libs # path to the libs directory within the Kafka release
 
     }

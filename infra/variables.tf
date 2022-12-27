@@ -41,3 +41,16 @@ variable "eh_connection_string" {
   type        = string
   description = "passowrd for pg"
 }
+variable "acr_regitry_url" {
+  type        = string
+  description = "passowrd for pg"
+}
+variable "acr_image_name" {
+  type        = string
+  description = "passowrd for pg"
+}
+variable "acr_image_tag" {
+  type        = string
+  description = "passowrd for pg"
+  default     = "latest"
+}

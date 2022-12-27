@@ -9,3 +9,19 @@ resource "azurerm_storage_account" "storage_main" {
     environment = var.environment
   }
 }
+
+resource "azurerm_storage_share" "container_mount" {
+  name                 = "containermount"
+  storage_account_name = azurerm_storage_account.storage_main.name
+  quota                = 1
+
+  # acl {
+  #   id = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI"
+
+  #   access_policy {
+  #     permissions = "rwdl"
+  #     start       = "2019-07-02T09:38:21.0000000Z"
+  #     expiry      = "2019-07-02T10:38:21.0000000Z"
+  #   }
+  # }
+}
