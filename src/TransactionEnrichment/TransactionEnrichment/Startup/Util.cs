@@ -22,9 +22,10 @@ namespace TransactionEnrichment.Startup
         public static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
             services.AddConfigCustom<Config.Database>(config: hostContext.Configuration, nameof(Config.Database));
+            services.AddConfigCustom<Config.EventHubSenderConfig>(hostContext.Configuration, nameof(Config.EventHubSenderConfig));
+            services.AddSingleton<ISendEnrichedEvent, EventHubSender>();
             services.AddSingleton<IGetGeoLocation, LocalGeoLocator>();
-            var val1 = hostContext.Configuration.GetValue<string>("PEACE");
-            Console.WriteLine($"val1 is {val1}");
+
             ConfigureDatabase(hostContext, services);
             //services.AddScoped<Functions>();
             // Add Odata
@@ -44,6 +45,8 @@ namespace TransactionEnrichment.Startup
             //        TimeSpan.FromSeconds(5),
             //        TimeSpan.FromSeconds(10),
             //    }));
+            var val1 = hostContext.Configuration.GetValue<string>("PEACE");
+            Console.WriteLine($"val1 is {val1}");
         }
         public static void ConfigureDatabase(HostBuilderContext hostContext, IServiceCollection services)
         {

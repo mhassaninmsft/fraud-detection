@@ -19,6 +19,7 @@ namespace TransactionEnrichment
         private readonly MagicBankContext _magicBankContext;
         private readonly Transformation _transformation;
         private readonly IGetGeoLocation _geoLocator;
+        private readonly ISendEnrichedEvent _enrichedEventSender;
         private readonly JsonSerializerOptions serializeOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = new SnakeCaseNamingPolicy(),
@@ -27,12 +28,13 @@ namespace TransactionEnrichment
         };
 
         public Function1(ILoggerFactory loggerFactory, MagicBankContext magicBankContext,
-            IOptions<Transformation> transformationOptions, IGetGeoLocation geoLocator)
+            IOptions<Transformation> transformationOptions, IGetGeoLocation geoLocator, ISendEnrichedEvent enrichedEventSender)
         {
             _logger = loggerFactory.CreateLogger<Function1>();
             _magicBankContext = magicBankContext;
             _transformation = transformationOptions.Value;
             _geoLocator = geoLocator;
+            _enrichedEventSender = enrichedEventSender;
         }
 
         [Function("Function2")]
@@ -66,12 +68,21 @@ namespace TransactionEnrichment
                     return;
                 }
                 _logger.LogInformation(JsonSerializer.Serialize(creditCardTx));
-                var tx = _magicBankContext.CreditCardTransactions.Where(tx => tx.Id == creditCardTx.Id).Include(x => x.PosMachine).First();
+                var tx = _magicBankContext.CreditCardTransactions.Where(tx => tx.Id == creditCardTx.Id).Include(x => x.PosMachine).Include(x => x.CreditCard).First();
                 _logger.LogInformation($"{tx}");
-                var myElem = new { id = tx.Id, merchantId = tx.PosMachine.MerchantId, loc = tx.PosMachine.ZipCode, amount = tx.Amount };
-                var geoLocation = _geoLocator.GetGeoLocationByZipCode(myElem.loc).Result;
+                var geoLocation = _geoLocator.GetGeoLocationByZipCode(tx.PosMachine.ZipCode).Result;
                 _logger.LogInformation($"Geo Location is {geoLocation}");
-                _logger.LogInformation($"{myElem}");
+                var enrichedEvent = new EnrichedEvent()
+                {
+                    Id = tx.Id.ToString(),
+                    CreditCardId = tx.CreditCardId.ToString(),
+                    Latitude = geoLocation.Latitude,
+                    Longtitude = geoLocation.Longtitude,
+                    PosMachineId = tx.PosMachineId.ToString(),
+                    TxTime = DateTime.UtcNow,
+                    ZipCode = tx.PosMachine.ZipCode
+                };
+                _enrichedEventSender.SendEnrichedEvent(enrichedEvent).Wait();
             }
 
         }
