@@ -54,3 +54,13 @@ variable "acr_image_tag" {
   description = "passowrd for pg"
   default     = "latest"
 }
+variable "acr_username" {
+  type        = string
+  description = "passowrd for pg"
+}
+variable "acr_password" {
+  type        = string
+  description = "passowrd for pg"
+}
+
+
