@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TransactionEnrichment.Services;
 
 namespace TransactionEnrichment.Startup
 {
@@ -21,7 +22,7 @@ namespace TransactionEnrichment.Startup
         public static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
             services.AddConfigCustom<Config.Database>(config: hostContext.Configuration, nameof(Config.Database));
-
+            services.AddSingleton<IGetGeoLocation, LocalGeoLocator>();
             var val1 = hostContext.Configuration.GetValue<string>("PEACE");
             Console.WriteLine($"val1 is {val1}");
             ConfigureDatabase(hostContext, services);

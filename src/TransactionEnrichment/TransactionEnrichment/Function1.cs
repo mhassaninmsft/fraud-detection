@@ -1,5 +1,6 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -7,6 +8,7 @@ using System.Text.Json;
 using TransactionEnrichment.Config;
 using TransactionEnrichment.Models;
 using TransactionEnrichment.Models2;
+using TransactionEnrichment.Services;
 using static TransactionEnrichment.Util.Json;
 
 namespace TransactionEnrichment
@@ -16,6 +18,7 @@ namespace TransactionEnrichment
         private readonly ILogger _logger;
         private readonly MagicBankContext _magicBankContext;
         private readonly Transformation _transformation;
+        private readonly IGetGeoLocation _geoLocator;
         private readonly JsonSerializerOptions serializeOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = new SnakeCaseNamingPolicy(),
@@ -24,24 +27,12 @@ namespace TransactionEnrichment
         };
 
         public Function1(ILoggerFactory loggerFactory, MagicBankContext magicBankContext,
-            IOptions<Transformation> transformationOptions)
+            IOptions<Transformation> transformationOptions, IGetGeoLocation geoLocator)
         {
             _logger = loggerFactory.CreateLogger<Function1>();
             _magicBankContext = magicBankContext;
             _transformation = transformationOptions.Value;
-        }
-
-        [Function("Function1")]
-        public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req)
-        {
-            _logger.LogInformation("C# HTTP trigger function processed a request. 23");
-
-            var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-            _magicBankContext.PosMachines.Select(s => s.Merchant).ToList().ForEach(s => _logger.LogInformation($"{s}"));
-            response.WriteString("Welcome to Azure Functions!");
-
-            return response;
+            _geoLocator = geoLocator;
         }
 
         [Function("Function2")]
@@ -60,18 +51,28 @@ namespace TransactionEnrichment
         }
 
         [Function("Function3")]
-        public void Run3([EventHubTrigger("ds1.public.credit_card_transaction", Connection = "EH_CONNECTION_STRING", ConsumerGroup = "$Default")] string[] input)
+        public void Run3([EventHubTrigger(Constants.EH_SOURCE_TOPIC, Connection = "EH_CONNECTION_STRING", ConsumerGroup = "$Default")] string[] input)
         {
             foreach (var val in input)
             {
-                Console.WriteLine(val);
-                var merchant1 = JsonSerializer.Deserialize<DebiziumChangeEvent<CreditCardTransaction>>(val, serializeOptions);
-                Console.WriteLine(merchant1);
-                Console.WriteLine(JsonSerializer.Serialize(merchant1?.Payload?.Before));
-                Console.WriteLine(JsonSerializer.Serialize(merchant1?.Payload?.After));
-
+                _logger.LogInformation(val);
+                var cardTxEvent = JsonSerializer.Deserialize<DebiziumChangeEvent<CreditCardTransaction>>(val, serializeOptions);
+                _logger.LogInformation($"{cardTxEvent}");
+                _logger.LogInformation(JsonSerializer.Serialize(cardTxEvent?.Payload?.Before));
+                var creditCardTx = cardTxEvent?.Payload?.After;
+                if (creditCardTx == null)
+                {
+                    _logger.LogWarning("Received an empty card transaction");
+                    return;
+                }
+                _logger.LogInformation(JsonSerializer.Serialize(creditCardTx));
+                var tx = _magicBankContext.CreditCardTransactions.Where(tx => tx.Id == creditCardTx.Id).Include(x => x.PosMachine).First();
+                _logger.LogInformation($"{tx}");
+                var myElem = new { id = tx.Id, merchantId = tx.PosMachine.MerchantId, loc = tx.PosMachine.ZipCode, amount = tx.Amount };
+                var geoLocation = _geoLocator.GetGeoLocationByZipCode(myElem.loc).Result;
+                _logger.LogInformation($"Geo Location is {geoLocation}");
+                _logger.LogInformation($"{myElem}");
             }
-            _logger.LogInformation($"First Event Hubs triggered message: {input[0]}");
 
         }
     }
