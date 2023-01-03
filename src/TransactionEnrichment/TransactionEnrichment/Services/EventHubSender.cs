@@ -8,7 +8,7 @@ using TransactionEnrichment.Models2;
 
 namespace TransactionEnrichment.Services
 {
-    internal class EventHubSender : ISendEnrichedEvent
+    public class EventHubSender : ISendEnrichedEvent
     {
         private readonly ILogger _logger;
         private readonly EventHubSenderConfig _eventHubSenderConfig;

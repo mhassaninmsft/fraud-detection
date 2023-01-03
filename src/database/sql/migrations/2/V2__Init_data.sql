@@ -11,7 +11,6 @@
 --     expiration_month int NOT NULL,
 --     expiration_year int NOT NULL
 -- );
-
 DO $$
 DECLARE merchant_id       merchant.id%TYPE;
 DECLARE credit_card1_id   credit_card.id%TYPE;
