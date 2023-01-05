@@ -1,5 +1,15 @@
 # fraud-detection
 
+- [fraud-detection](#fraud-detection)
+  - [database](#database)
+    - [entity framework](#entity-framework)
+  - [Stream Analytics Query](#stream-analytics-query)
+  - [Resources](#resources)
+  - [Suggestions](#suggestions)
+  - [Tools to explore](#tools-to-explore)
+  - [Questions](#questions)
+  - [issues created](#issues-created)
+
 ## database
 
 export PGPASSWORD=magical_password
@@ -52,7 +62,11 @@ FROM
 2. Settint `wal_level` in terraform does not auto restart the azure flexible postgres database. It needs to be restarted manually
 3. The documentation for the debizium event hub connector is not up to data.
 
-## Questins
+## Tools to explore
+
+1. Synth: https://www.getsynth.com/docs/content/object, debug postgresql uuid
+
+## Questions
 
 1. EF Core (Write/Read Replicas) pattern
 2. Exclude tables in EF core not supported??
@@ -62,4 +76,5 @@ FROM
 ## issues created
 
 1. https://github.com/MicrosoftDocs/azure-docs/issues/103340
-2. https://social.msdn.microsoft.com/Forums/azure/en-US/2b568bf4-8c32-40ea-a504-9d5b581c9145/creating-multiple-databases-in-postgresql-hyperscale-cluster-server-group?forum=AzureDatabaseforPostgreSQL
+2. https://github.com/dotnet/efcore/issues/6182
+3. https://social.msdn.microsoft.com/Forums/azure/en-US/2b568bf4-8c32-40ea-a504-9d5b581c9145/creating-multiple-databases-in-postgresql-hyperscale-cluster-server-group?forum=AzureDatabaseforPostgreSQL

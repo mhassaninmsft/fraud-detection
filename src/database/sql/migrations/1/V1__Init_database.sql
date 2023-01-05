@@ -40,4 +40,14 @@ CREATE OR REPLACE FUNCTION add_two(a integer, b integer) RETURNs integer
     RETURNS NULL ON NULL INPUT
     RETURN (a + b);
 
+CREATE OR REPLACE FUNCTION concat_mk(a text, b text) RETURNs text
+    LANGUAGE SQL
+    IMMUTABLE
+    RETURNS NULL ON NULL INPUT
+    RETURN (a || b);
 
+
+CREATE OR REPLACE FUNCTION search_by_year(a integer) RETURNs SETOF credit_card
+     AS $$
+    SELECT * FROM credit_card WHERE expiration_year=a;
+$$ LANGUAGE SQL;

@@ -13,6 +13,8 @@ public partial class CreditCardTransaction
 
     public double Amount { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
     public virtual CreditCard CreditCard { get; set; } = null!;
 
     public virtual PosMachine PosMachine { get; set; } = null!;

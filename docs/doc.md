@@ -17,6 +17,8 @@ This paper explains how to use real time streaming analytics in Azure Cosmos Db 
     - [Streaming vs Batch Processing](#streaming-vs-batch-processing)
       - [System used](#system-used)
   - [Azure Enriching Function](#azure-enriching-function)
+    - [Alternatives to the Azure Enriching Function](#alternatives-to-the-azure-enriching-function)
+  - [Stream Analytics Job](#stream-analytics-job)
 
 ## Scenario
 
@@ -69,12 +71,21 @@ We are using Debizium Connector to stream the events of the `credit_card_transac
 
 ## Azure Enriching Function
 
-After the evetns reach the eventhubs, An Azure function listens on the event hub and is triggered everytime a new `credit_card_transaction` is created. The purpose of the Azure function is to create an enriched event that contains all the details of the `credit_card_trasnsaction` evnet. The need for such event processing function arises due to the fact that our SQL models are normalized and the `credit_card_transaction` table only contains the ids of the credit_card used as well as the pos_machine. But it does not have any direct information on the location of the sale nor informatoin about the merchant. To get that inforamtion we have to run the query
+After the events reach the eventhubs, An Azure function listens on the event hub and is triggered every time a new `credit_card_transaction` is created. The purpose of the Azure function is to create an enriched event that contains all the details of the `credit_card_trasnsaction` event. The need for such event processing function arises due to the fact that our SQL models are normalized and the `credit_card_transaction` table only contains the ids of the credit_card used as well as the pos_machine. But it does not have any direct information on the location of the sale nor information about the merchant. To get that information we have to run the query
 
 ```SQL
 SELECT *
 FROM credit_card_transaction tx
 JOIN pos_machine pm ON tx.pos_machine_id = pm.id
 JOIN credit_card cc ON  tx.credit_card_id = cc.id
-WHERE tx.id=='the transaction id that occured'
+WHERE tx.id=='the transaction id that occurred'
 ```
+
+### Alternatives to the Azure Enriching Function
+
+1. Using SQL reference data tables is only supported for Microsft SQL server
+2. Having the Azure enriching function, we have control over calls to the underlying database and we can cache responses using the SDK and other libraries easily. For example the reference data contained in the `merchant` and the `credit_card` table can be easily cached client side with a valid TTL. Moreover, using the provided database SDK, we can batch requests to the SQL database, allevaiting the load on the database. These considerations can be tricky to implment using Stream analytics alone.
+
+## Stream Analytics Job
+
+The

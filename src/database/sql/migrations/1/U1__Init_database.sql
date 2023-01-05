@@ -1,3 +1,5 @@
+DROP FUNCTION IF EXISTS search_by_year;
+DROP FUNCTION IF EXISTS concat_mki0;
 DROP FUNCTION IF EXISTS add_two;
 DROP TABLE IF EXISTS credit_card_transaction;
 DROP TABLE IF EXISTS credit_card;

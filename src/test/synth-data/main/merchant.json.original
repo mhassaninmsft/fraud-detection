@@ -1,0 +1,37 @@
+{
+  "type": "array",
+  "length": {
+    "type": "number",
+    "range": {
+      "low": 1,
+      "high": 10,
+      "step": 1
+    },
+    "subtype": "u64"
+  },
+  "content": {
+    "type": "object",
+    "id": {
+      "type": "one_of",
+      "variants": [
+        {
+          "weight": 1.0,
+          "type": "unique",
+          "algorithm": {
+            "Hash": {
+              "retries": null
+            }
+          },
+          "content": {
+            "type": "string",
+            "uuid": null
+          }
+        }
+      ]
+    },
+    "name": {
+      "type": "string",
+      "pattern": "[a-zA-Z0-9]{15, 25}"
+    }
+  }
+}

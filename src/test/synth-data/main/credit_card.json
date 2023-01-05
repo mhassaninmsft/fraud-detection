@@ -1,0 +1,61 @@
+{
+  "type": "array",
+  "length": {
+    "type": "number",
+    "range": {
+      "low": 1,
+      "high": 4,
+      "step": 1
+    },
+    "subtype": "u64"
+  },
+  "content": {
+    "type": "object",
+    "card_number": {
+      "type": "string",
+      "pattern": "[a-zA-Z0-9]{15, 16}"
+    },
+    "client_name": {
+      "type": "string",
+      "pattern": "[a-zA-Z0-9]{15, 16}"
+    },
+    "expiration_month": {
+      "type": "number",
+      "range": {
+        "low": 1,
+        "high": 12
+      },
+      "subtype": "i32"
+    },
+    "expiration_year": {
+      "type": "number",
+      "range": {
+        "low": 23,
+        "high": 29
+      },
+      "subtype": "i32"
+    },
+    "id": {
+      "type": "one_of",
+      "variants": [
+        {
+          "weight": 1.0,
+          "type": "unique",
+          "algorithm": {
+            "Hash": {
+              "retries": null
+            }
+          },
+          "content": {
+            "type": "string",
+            "uuid": null
+          }
+        }
+      ]
+    },
+    "issuing_bank": {
+      "type": "string",
+      "pattern": "[a-zA-Z0-9]{6, 7}"
+    }
+  }
+}
