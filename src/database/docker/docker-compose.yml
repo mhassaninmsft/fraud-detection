@@ -7,8 +7,7 @@ services:
       - "5432:5432"
     env_file:
       - postgres.env # configure postgres
-    environment:
-      PGOPTIONS: "-c wal_level=logical -c max_wal_senders=3"
+    command: "-c wal_level=logical -c max_wal_senders=3"
     volumes:
       - postgres-bank-data:/var/lib/postgresql/data/ # persist data even if container shuts down
 volumes:
