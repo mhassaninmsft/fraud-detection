@@ -43,6 +43,8 @@ services:
   #     - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
   connect:
     image: debezium/connect:latest
+    networks:
+     - common_network
     volumes:
       - ./connect-config/java.config:/etc/crypto-policies/back-ends/java.config
       - .:/tmp

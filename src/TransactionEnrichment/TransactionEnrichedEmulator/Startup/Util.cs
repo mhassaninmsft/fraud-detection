@@ -1,4 +1,5 @@
-﻿using TransactionEnrichment.Services;
+﻿using StackExchange.Redis;
+using TransactionEnrichment.Services;
 using TransactionEnrichment.Startup;
 
 namespace TransactionEnrichedEmulator.Startup
@@ -21,6 +22,11 @@ namespace TransactionEnrichedEmulator.Startup
             //services.AddConfigCustom<TransactionEnrichment.Config.Database>(config: hostContext.Configuration, nameof(Config.Database));
             services.AddConfigCustom<TransactionEnrichment.Config.EventHubSenderConfig>(hostContext.Configuration, nameof(TransactionEnrichment.Config.EventHubSenderConfig));
             services.AddSingleton<ISendEnrichedEvent, EventHubSender>();
+            //Configure other services up here
+            var redisConnectionString = hostContext.Configuration.GetValue<string>("RedisConnectionString");
+            var multiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+            Console.Write(redisConnectionString);
+            services.AddSingleton<IConnectionMultiplexer>(multiplexer);
             //services.AddSingleton<IGetGeoLocation, LocalGeoLocator>();
             services.AddSingleton<Emulator>();
             services.AddHostedService<Worker>();
