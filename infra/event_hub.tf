@@ -10,10 +10,12 @@ resource "azurerm_eventhub_namespace" "eh_namespace" {
   }
 }
 
+# Add the enriched event output name here, change name from transactins to
+# ds1.public.enriched_event_data
 resource "azurerm_eventhub" "eh_topic" {
-  name                = "transactions"
+  name                = "ds23.public.enriched_credit_card_transaction"
   namespace_name      = azurerm_eventhub_namespace.eh_namespace.name
   resource_group_name = azurerm_resource_group.main_resource_group.name
-  partition_count     = 2
-  message_retention   = 1
+  partition_count     = 1
+  message_retention   = 7
 }

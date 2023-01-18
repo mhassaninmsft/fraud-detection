@@ -62,5 +62,9 @@ variable "acr_password" {
   type        = string
   description = "passowrd for pg"
 }
-
+variable "streaming_units" {
+  type        = number
+  description = "number of streaming units for the Azure stream analytics job"
+  default     = 1
+}
 

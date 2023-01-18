@@ -21,7 +21,7 @@ DECLARE pos_machine_id    pos_machine.id%TYPE;
 -- DECLARE v_studentid bigint;
 BEGIN
 INSERT INTO bank(name,address) VALUES('Bank of Commerce','15 Evergreen terrace, WA 01519') RETURNING id INTO bank_id;
-INSERT INTO client(name,dob,ssn) VALUES('Jason Bourne','07-01-1998','555245555') RETURNING id INTO client_id;
+INSERT INTO client(name,dob,ssn) VALUES('Jason Bourne','07-01-1998','555275555') RETURNING id INTO client_id;
   INSERt INTO merchant(name)
 VALUES('Brewed Awakenings Coffee') RETURNING id INTO merchant_id;
 INSERT INTO pos_machine(zip_code,merchant_id)

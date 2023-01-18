@@ -71,7 +71,8 @@ FROM
 1. EF Core (Write/Read Replicas) pattern
 2. Exclude tables in EF core not supported??
 3. Canonical way to execute Stored Proecures in EF core. Is there a way to auto generate stored proecudes/ user functions into strongly typed C# functions/classes.
-
+4. How to add a partition key that is nested for a stream analytics event hub input. The parititon key needed is `payload.after.credit_card_id` I get the error `The partition key can only contain alphanumeric characters, underscores, spaces and hyphens`
+5. Why does assigning IAM roles and identites in terraform require the `Owner` permission of the service principal on the entire subscription. Can it perhaps be localized to a few resources or resource groups.
 
 ## issues created
 
