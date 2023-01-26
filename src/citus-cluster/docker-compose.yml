@@ -19,9 +19,36 @@ services:
       PGPASSWORD: "magical_password"
       POSTGRES_HOST_AUTH_METHOD: "${POSTGRES_HOST_AUTH_METHOD:-trust}"
       # PGOPTIONS: "-c wal_level=logical -c max_wal_senders=3"
-  worker:
+  worker1:
     image: "citusdata/citus:11.1.5"
     labels: ["com.citusdata.role=Worker"]
+    ports:
+      - 5434:5432
+    depends_on: [manager]
+    networks:
+     - common_network
+    environment: *AUTH
+    command: "/wait-for-manager.sh"
+    volumes:
+      - healthcheck-volume:/healthcheck
+  worker2:
+    image: "citusdata/citus:11.1.5"
+    labels: ["com.citusdata.role=Worker"]
+    ports:
+      - 5435:5432
+    depends_on: [manager]
+    networks:
+     - common_network
+    environment: *AUTH
+    command: "/wait-for-manager.sh"
+    volumes:
+      - healthcheck-volume:/healthcheck
+
+  worker3:
+    image: "citusdata/citus:11.1.5"
+    labels: ["com.citusdata.role=Worker"]
+    ports:
+      - 5436:5432
     depends_on: [manager]
     networks:
      - common_network

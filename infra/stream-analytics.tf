@@ -25,7 +25,7 @@ EnchancedData AS
 SELECT ed1.credit_card_id , COUNT(*), Collect(ed1.zip_code), COUNT( DISTINCT ed1.zip_code) AS zip_codes
 INTO queue1
 FROM EnchancedData ed1
-GROUP BY ed1.credit_card_id, SlidingWindow(Duration(minute, 1))
+GROUP BY ed1.credit_card_id, SlidingWindow(Duration(minute, 10))
 HAVING zip_codes>1;
 QUERY
 }

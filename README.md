@@ -9,6 +9,7 @@
   - [Tools to explore](#tools-to-explore)
   - [Questions](#questions)
   - [issues created](#issues-created)
+  - [Commands](#commands)
 
 ## database
 
@@ -79,3 +80,12 @@ FROM
 1. https://github.com/MicrosoftDocs/azure-docs/issues/103340
 2. https://github.com/dotnet/efcore/issues/6182
 3. https://social.msdn.microsoft.com/Forums/azure/en-US/2b568bf4-8c32-40ea-a504-9d5b581c9145/creating-multiple-databases-in-postgresql-hyperscale-cluster-server-group?forum=AzureDatabaseforPostgreSQL
+
+
+## Commands
+- Citus Commnads
+
+```SQL
+SELECT run_command_on_workers('ALTER SYSTEM SET wal_level TO logical');
+SELECT run_command_on_workers('SHOW wal_level;');
+```
