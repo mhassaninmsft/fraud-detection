@@ -1,6 +1,15 @@
 # Fraud Detection and Advanced analytics
 
-This paper explains how to use real time streaming analytics in Azure Cosmos Db for Postgresql (Citus database).
+In this post we explore one of the newest offerings into the Azure database ecosystem, namely Azure Cosmos Db for Postgresql. I know that you are a little surprised, because up until that offering, Cosmos DB has been tradiotinaly a NoSQL database, but with that offering Cosmos now offers a truly relational SQL database. So what is new in that offering and why is it different than Microsoft other Postgresql database (Azure Flexible Server). Th3e difference is that Azure Cosmos db for Postgresql offers a Distributed SQL paradigm on top of traditional PostgreSQL. so what is Distributed SQL and why is it a big deal.
+
+Traditional Single node SQL has been around for a very along time, its ubiquitousness, plethora of tool support, developer familiarity with it makes it a very suitable tool for most applications. The actual strngth of SQL is the relational model and different constraints that can be enforced at the database level. SQL databases can help prevent data drift, missing references, also support for ACID transactions ensure that such constraints are met all the time.
+
+In the early 2010s, traditional SQL databases failed to meet the demands of the growing internet companies since at that time most Offerings of SQL ran on a single machine for handling writes, replication was only done for backup and serving reads (read replicas). However the system was bottle necked to a single write node. Solutions existed for multi writer nodes such as manually sharding the data across different servers, but such solutions were extremely difficult and required massive engineering feats to get right especially in production and when facing huge workloads. Moreover a typical sharded system would sacrifice distributed transactions. When losing distributed transactions, the system loses one of its main strengths for data consistency at scale. And hence the NoSQL movement emerged which offered easy horizontal scalability with limited support for transactions initially (some flavors Distributed transactions were later supported in MongodDb and other NoSQL providers). Most of the data consistency checks were delegate to the application layer instead of the database. This was a perfectly acceptable solution but at the cost of more application complexity and mental manual effort to keep the application state consistent.
+
+As discussed earlier NoSQL databases had to give up many of the data constraints enforced by SQL and had to relegate those checks to the application layer. Distributed database SQL include Azure Cosmos db for Postgresql (formerly citus database for SQL), Google Spanner, Cockroach db and Yugabyte. One can think of the distributed SQL movement as the marriage of (traditional SQL databases with their ACID guartntees and Full SQL support) and NoSQL Databases with their horizontal scalability and easy sharding/partitioning. It
+
+
+This post explains how to use real time streaming analytics in Azure Cosmos Db for Postgresql (Citus database).
 
 ## Table of Contents
 
@@ -9,7 +18,6 @@ This paper explains how to use real time streaming analytics in Azure Cosmos Db 
   - [Scenario](#scenario)
     - [Technical Considerations](#technical-considerations)
     - [Why use a Relational database](#why-use-a-relational-database)
-      - [Ubiquitousness of SQL](#ubiquitousness-of-sql)
       - [Why NoSQL](#why-nosql)
       - [The Distributed Sql Movment](#the-distributed-sql-movment)
   - [Architecture](#architecture)
@@ -17,11 +25,14 @@ This paper explains how to use real time streaming analytics in Azure Cosmos Db 
   - [Move to Distributed SQL](#move-to-distributed-sql)
     - [Table partitioning](#table-partitioning)
     - [Benefits of Citus Database for SQL](#benefits-of-citus-database-for-sql)
+  - [Limitations of the Azure Postresql offering](#limitations-of-the-azure-postresql-offering)
+  - [Next steps](#next-steps)
+- [Summary](#summary)
 
 ## Scenario
 
 In this example we are assuming that we are PayCo, a fictional credit card issuer that is similar to Visa or MasterCard. PayCo is responsible for issuing Credit cards for users on behalf of different banks and is charged with settling transactions.
-In this paper, we will be focusing on near real time fraud detection of credit card transactions. The purpose of this exercise is not to immediately stop a transaction from occuring, but very soon after that to identify is such transaction is valid or not. This is the approach that most cards take for fraud detection. So after the transaction occurs in near real time (10 seconds or so), the user is notified via SMS or email of the transaction and is asked to confirm whether the transaction is legitimate or not.
+In this paper, we will be focusing on near real time fraud detection of credit card transactions. The purpose of this exercise is not to immediately stop a transaction from occuring, but very soon after that to identify is such transaction is valid or not. So after the transaction occurs in near real time, the user is notified via SMS or email of the transaction and is asked to confirm whether the transaction is legitimate or not.
 
 ### Technical Considerations
 
@@ -29,18 +40,13 @@ The desired system should be designed to handle tens of thousands of transaction
 
 ### Why use a Relational database
 
-#### Ubiquitousness of SQL
-
-SQL has been around for a very along time, its ubiquitousness, plethora of tool support, developer familiarity with it makes it a very suitable tool for most applications. The actual strngth of SQL is the relational model and different constraints that can be enforced at the database level. SQL databases can help prevent data drift, missing references, also support for ACID transactions ensure that such constraints are met all the time.
-
 #### Why NoSQL
 
-In the early 2010s, traditional SQL databases failed to meet the demands of the growing internet companies since at that time most Offerings of SQL ran on a single machine for handling writes, replication was only done for backup and serving reads (read replicas). However the system was bottle necked to a single write node. Solutions existed for multi writer nodes such as manually sharding the data across different servers, but such solutions were extremely difficult and required massive engineering feats to get right especially in production and when facing huge workloads. Moreover a typical sharded system would sacrifice distributed transactions. When losing distributed transactions, the system loses one of its main strengths for data consistency at scale. And hence the NoSQL movement emerged which offered easy horizontal scalability with limited support for transactions initially (some flavors Distributed transactions were later supported in MongodDb and other NoSQL providers). Most of the data consistency checks were delegate to the application layer instead of the database. This was a perfectly acceptable solution but at the cost of more application complexity and mental
+
 
 #### The Distributed Sql Movment
 
-As explained earlier NoSQL databases had to give up many of the data constraints enforecd by SQL and had to relrgate thos cehcks to the application layer
-Distributed database SQL include citus databse for SQL, Google Spanner, Cockroach db and Yugabyte. One can think of the distributed SQL movement as the marriage of (traditional SQL databases with their ACID guartntees and Full SQL support) and NoSQL Databases with their horizontal scalability and easy sharding/partitioning
+
 
 ## Architecture
 
@@ -48,7 +54,7 @@ We will start off with a single Postgresql database to store all the transaction
 
 We are using Debizium Connector to stream the events of the `credit_card_transactions` table into Azure event hubs. We are using Apache Debizium connector for Apache Kafka. Azure event hubs expose a Kafka Compatible endpoint. Debizium can capture all changes to the database It utilizes a PSQL feature called logical replication. The main idea is that PSQL internally uses a Write Ahead Log (WAL) to record every transaction and operation happening in the database both DDL  (such as CREATE TABLE, ALTER Table, ADD Constraint) and DML such as (INSERT INTO, UPDATE). We capture such events from the database and save them to a eventhub.
 
-Ideally we should not have to create another table `enriched_credit_card_transaction` which contains the data in a denormalized fashion and instead we can rely on a SQL view to get the data enriched in that fashion, however the debizium connector unfortuanelty does not operate on views and only operates on tables. Moreover PSQL does not support `live` views where the data is auto populated into the view, and instead a query has to run every time data is updated. Hence we crate the `enriched_credit_card_transaction` table and have a database trigger on new inserts on `credit_card_transaction` to insert into the `enriched_credit_card_transaction` and then use debizium to only stream the changes to `enriched_credit_card_transaction` to an event hub stream.
+Ideally we should not have to create another table `enriched_credit_card_transaction` which contains the data in a denormalized fashion and instead we can rely on a SQL view to get the data enriched in that fashion, however the debizium connector unfortuanelty does not operate on views and only operates on tables. Moreover PSQL does not support `live` views where the data is auto populated into the view, and instead a query has to run every time data is updated. Hence we create the `enriched_credit_card_transaction` table and have a database trigger on new inserts on `credit_card_transaction` to insert into the `enriched_credit_card_transaction` and then use debizium to only stream the changes to `enriched_credit_card_transaction` to an event hub stream.
 
 ## Stream Analytics Job
 
@@ -78,3 +84,16 @@ Although Citus does not support this yet, a beneifit of sharding the data based 
 1. Simple extension over Postgresql which can be a drop in replacement for most SQL applications.
 2. Distributed database can handle more traffic and may forestall the need to use and manage a tradiional NoSql database such as NoSQL Cosmos, mongoDb, or others.
 3. In a traditional application
+
+## Limitations of the Azure Postresql offering
+
+1. The current offering in Azure has a limitation that the created database user does not have admin privilges. Admin privilges are required for Streaming Data to Event hub (It requires the postgres user to have `REPLICATION` rights). As a workaround. I am running a Citus cluster in Azure Kubernetes Server and not using the managed Cosmos db offering.
+2. Currently you need to start a debizium connector per worker node. I am currently doing that via a sidecar container in each worker pod. The sidecar on startup starts a debizium connector and sends the worker logs to Eventhub.
+
+## Next steps
+
+1. I am working on a Postgresql extension to automate creating the debizum connectors when new worker nodes join the cluster
+
+# Summary
+
+There are many innovations happening in the database world. Distributed SQL is a key feature and one that will be the standard in the next decade or so. It will be a lot easier to move data between different storage technologies via out of the box streming connections and even Zero ETL approaches, where the platform can automatically stream the data between different database technologies. There will be even less need to move data between different database systems  as we have demonstrated here with the Cosmos db Postgresql engine where real time analytics can be performed on the cluster with distributed data. Other innovatins in the data space include separating the storage and compute layer of the databases, decomposing the compute layer into smaller subqueries and dispatching those to the storage layer and the ability to scale the query layer and stoage layer separaety( Google ).
