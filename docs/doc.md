@@ -83,7 +83,7 @@ SELECT create_distributed_table('credit_card', 'id');
 SELECT create_distributed_table('credit_card_transaction', 'credit_card_id');
 ```
 
-https://github.com/mhassaninmsft/fraud-detection/blob/final-readme/src/database/sql/migrations/1/V1__Init_database.sql
+https://gist.github.com/hassanin/c0a1dac1b53edf505189adc19356dfc7
 
 `reference tables` are tables that are replicated to all worker nodes in the cluster. They are typically small in size and are used often in Joins. `distributed tables` on the other hand tend to be fairly large and benefit from sharding. In our use case, credit cards and the credit card transactions are sharded by credit_card_id, which means all credit_cards and all transactions belonging to that card will belong to the same physical Postgresql server.
 
