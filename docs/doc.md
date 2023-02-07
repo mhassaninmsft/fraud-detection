@@ -1,8 +1,8 @@
-# Fraud Detection and Advanced analytics
+# Fraud Detection using Distributed SQL
 
 ## Table of Contents
 
-- [Fraud Detection and Advanced analytics](#fraud-detection-and-advanced-analytics)
+- [Fraud Detection using Distributed SQL](#fraud-detection-using-distributed-sql)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
     - [Traditional SQL](#traditional-sql)
@@ -13,13 +13,13 @@
   - [Stream Analytics Job](#stream-analytics-job)
   - [Moving to use to Distributed SQL](#moving-to-use-to-distributed-sql)
     - [Benefits of Citus Database for SQL](#benefits-of-citus-database-for-sql)
-  - [Limitations of the Azure Postresql offering](#limitations-of-the-azure-postresql-offering)
+  - [Limitations of the Azure Postgresql offering](#limitations-of-the-azure-postgresql-offering)
   - [Next steps](#next-steps)
   - [Summary](#summary)
 
 ## Introduction
 
-In this post we explore one of the newest offerings into the Azure database ecosystem, namely Azure Cosmos Db for Postgresql. I know that sounds a little surprising because up until that offering, Cosmos DB has been traditionally a NoSQL database, but with that offering Cosmos now offers a truly relational SQL database. So what is new in that offering and why is it different than Microsoft other Postgresql database (Azure Flexible Server). Th3e difference is that Azure Cosmos db for Postgresql offers a Distributed SQL paradigm on top of traditional PostgreSQL. so what is Distributed SQL and why is it a big deal.
+In this post we explore one of the newest offerings into the Azure database ecosystem, namely [Azure Cosmos Db for Postgresql](https://learn.microsoft.com/en-us/azure/cosmos-db/postgresql/introduction). I know that sounds a little surprising because up until that offering, Cosmos DB has been traditionally a NoSQL database, but with that offering Cosmos now offers a truly relational SQL database. So what is new in that offering and why is it different than Microsoft other Postgresql database (Azure Flexible Server). The difference is that Azure Cosmos db for Postgresql offers a Distributed SQL paradigm on top of traditional PostgreSQL. so what is Distributed SQL and why is it a big deal.
 
 ### Traditional SQL
 
@@ -38,7 +38,7 @@ This post explains how to use real time streaming analytics in Azure Cosmos Db f
 ## Scenario
 
 In this example we are assuming that we are PayCo, a fictional credit card issuer that is similar to Visa or MasterCard. PayCo is responsible for issuing Credit cards for users on behalf of different banks and is charged with settling transactions.
-In this paper, we will be focusing on near real time fraud detection of credit card transactions. The purpose of this exercise is not to immediately stop a transaction from occuring, but very soon after that to identify is such transaction is valid or not. So after the transaction occurs in near real time, the user is notified via SMS or email of the transaction and is asked to confirm whether the transaction is legitimate or not.
+In this post, we will be focusing on near real time fraud detection of credit card transactions. The purpose of this exercise is not to immediately stop a transaction from occuring, but very soon after that to identify is such transaction is valid or not. So after the transaction occurs in near real time, the user is notified via SMS or email of the transaction and is asked to confirm whether the transaction is legitimate or not.
 
 ## Architecture
 
@@ -83,21 +83,18 @@ SELECT create_distributed_table('credit_card', 'id');
 SELECT create_distributed_table('credit_card_transaction', 'credit_card_id');
 ```
 
-<script src="https://gist.github.com/hassanin/c0a1dac1b53edf505189adc19356dfc7.js"></script>
-
 `reference tables` are tables that are replicated to all worker nodes in the cluster. They are typically small in size and are used often in Joins. `distributed tables` on the other hand tend to be fairly large and benefit from sharding. In our use case, credit cards and the credit card transactions are sharded by credit_card_id, which means all credit_cards and all transactions belonging to that card will belong to the same physical Postgresql server.
 
 Although Cosmos does not support this yet, a benefit of sharding the data based on the bank is that it may be possible in the future to specify which physical server each bank information goes to. This will be very beneficial in scenarios where data residency and sovereignty guarantees such as those imposed by GDPR much easier to manage (Note Cockroach db supports this already).
 
-Once the workload scales to multiple banks and many credit card transactions, it possible to add new worker nodes to distribute the data to. You can add node easily in the Azure Portal or via the CLI. Once you add the nodes, the data does not rebalance auyrom,atically, and you need to manually auto rebalance the data either in the Azure portal or via commands executed at the master node `SELECT rebalance_table_shards();`.
+Once the workload scales to multiple banks and many credit card transactions, it is possible to add new worker nodes to distribute the data to. You can add node easily in the Azure Portal or via the CLI. Once you add the nodes, the data does not rebalance automatically, and you need to manually auto rebalance the data either in the Azure portal or via commands executed at the master node `SELECT rebalance_table_shards();`.
 
 ### Benefits of Citus Database for SQL
 
 1. Simple extension over Postgresql which can be a drop in replacement for most SQL applications.
-2. Distributed database can handle more traffic and may forestall the need to use and manage a tradiional NoSql database such as NoSQL Cosmos, mongoDb, or others.
-3. In a traditional application
+2. Distributed database can handle more traffic and may forestall or completely eliminate the need to use and manage a traditional NoSql database such as NoSQL Cosmos, mongoDb, or others. The same applies for caching solution where the data can be read directly from the Postgresql database without the need of caching solutions such as redis.
 
-## Limitations of the Azure Postresql offering
+## Limitations of the Azure Postgresql offering
 
 1. The current offering in Azure has a limitation that the created database user does not have admin privileges. Admin privileges are required for Streaming Data to Event hub (It requires the postgres user to have `REPLICATION` rights). As a workaround. I am running a Citus cluster in Azure Kubernetes Server and not using the managed Cosmos db offering.
 2. Currently you need to start a debizium connector per worker node. I am currently doing that via a sidecar container in each worker pod. The sidecar on startup starts a debizium connector and sends the worker logs to Eventhub.
