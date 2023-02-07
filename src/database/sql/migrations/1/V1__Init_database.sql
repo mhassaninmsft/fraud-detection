@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS credit_card_transaction(
 CREATE INDEX credit_card_transaction_id_index ON credit_card_transaction(id);
 CREATE INDEX credit_card_transaction_cc_index ON credit_card_transaction(credit_card_id);
 
--- Enriched Functions
+-- Enriching Function
 CREATE TABLE enriched_credit_card_transaction AS
 SELECT tx.*, pm.zip_code AS purchase_zip_code, cc.client_id, bank.name AS bank_name, merchant.name AS merchant_name, client.name AS clinet_name
 FROM credit_card_transaction tx
@@ -99,19 +99,7 @@ EXECUTE FUNCTION insert_into_enriched();
 
 
 -- Functions and Stored Procedures
-CREATE OR REPLACE FUNCTION add_two(a integer, b integer) RETURNs integer
-    LANGUAGE SQL
-    IMMUTABLE
-    RETURNS NULL ON NULL INPUT
-    RETURN (a + b);
-
-CREATE OR REPLACE FUNCTION concat_mk(a text, b text) RETURNs text
-    LANGUAGE SQL
-    IMMUTABLE
-    RETURNS NULL ON NULL INPUT
-    RETURN (a || b);
-
-
+-- Example
 CREATE OR REPLACE FUNCTION search_by_year(a integer) RETURNs SETOF credit_card
      AS $$
     SELECT * FROM credit_card WHERE expiration_year=a;
