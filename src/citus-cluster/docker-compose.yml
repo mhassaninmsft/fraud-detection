@@ -32,19 +32,19 @@ services:
     command: [ "postgres", "-c", "port=5435" ]
     volumes:
       - healthcheck-volume:/healthcheck
-  # worker2:
-  #   image: "citusdata/citus:11.1.5"
-  #   # labels: ["com.citusdata.role=Worker"]
-  #   ports:
-  #     - 5433:5433
-  #   depends_on: [manager]
-  #   networks:
-  #    - common_network
-  #   environment: *AUTH
-  #   command: [ "postgres", "-c", "port=5433" ]
-  #   # command: "/wait-for-manager.sh"
-  #   volumes:
-  #     - healthcheck-volume:/healthcheck
+  worker2:
+    image: "citusdata/citus:11.1.5"
+    # labels: ["com.citusdata.role=Worker"]
+    ports:
+      - 5433:5433
+    depends_on: [manager]
+    networks:
+     - common_network
+    environment: *AUTH
+    command: [ "postgres", "-c", "port=5433" ]
+    # command: "/wait-for-manager.sh"
+    volumes:
+      - healthcheck-volume:/healthcheck
 
   # worker3:
   #   image: "citusdata/citus:11.1.5"
